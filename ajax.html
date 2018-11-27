@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script>
+function loadXMLDoc()
+{
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	{
+		//  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+		xmlhttp=new XMLHttpRequest(); //發出請求物件
+	}
+	else
+	{
+		// IE6, IE5 浏览器执行代码
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlhttp.onreadystatechange=function()
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) //如果伺服器成功回應
+		{
+			var type =xmlhttp.getResponseHeader("Content-Type"); //印出拿到的回應的型態
+			console.log(type); //印出拿出型態
+			if(type =="application/json; charset=utf-8"){ //形態要JSON 且 編碼要UTF-8
+				console.log(JSON.parse(xmlhttp.responseText)); //把JSON物件轉換成JS物件
+				var text = JSON.parse(xmlhttp.responseText); //JSON 轉換成 JS 物件
+				document.getElementById("myDiv").innerHTML=" 查詢的國家 :"+text.name+"</br>"+"coord lon: "+text.coord.lon+"</br>"+"weather id: "+text.weather[0].id+""+"</br>"+"weather main:"+text.weather[0].main; // 當前div值替換成所拿到的職				
+				
+			}
+			else
+			{
+				document.getElementById("myDiv").innerHTML="型態錯誤(限定JSON)"; // 當前div值替換成所拿到的職
+			}
+
+		}
+	}
+	xmlhttp.open("GET","http://api.openweathermap.org/data/2.5/weather?q=Taiwan&APPID=d4720e296b235be97f68bb5a90026e1f",true); //拿到 (送出的請求,URL,是否非同步)
+	xmlhttp.send(); //送出請求
+}
+function showHint(str) //監聽文字做非同步更新
+{
+  var xmlhttp;  //http 請求
+  var now_text; //現在監聽的文字
+  if (str.length==0) //字串沒有
+  { 
+     return document.getElementById("country_name").innerHTML="";
+   
+  }else  //有字串
+  {  
+	 now_text = document.getElementById("country_name").innerHTML=" 國家沒有 "+str; //獲得目前所打的字串
+	 if (window.XMLHttpRequest)  //是否有http 請求物件
+	{
+		//  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+		xmlhttp=new XMLHttpRequest(); //發出請求物件
+	}
+	else
+	{
+		// IE6, IE5 浏览器执行代码
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlhttp.onreadystatechange=function() // 當伺服器有回應時
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) //如果伺服器成功回應
+		{
+			var type =xmlhttp.getResponseHeader("Content-Type"); //印出拿到的回應的型態
+			console.log(type); //印出拿出型態
+			if(type =="application/json; charset=utf-8"){ //形態要JSON 且 編碼要UTF-8
+				console.log(JSON.parse(xmlhttp.responseText)); //把JSON物件轉換成JS物件
+				var text = JSON.parse(xmlhttp.responseText); //JSON 轉換成 JS 物件
+				document.getElementById("country_name").innerHTML=" 查詢的國家 :"+text.name+"</br>"+"coord lon: "+text.coord.lon+"</br>"+"coord lat: "+text.coord.lat+"</br>"+"weather id: "+text.weather[0].id+""+"</br>"+"weather main:"+text.weather[0].main; // 當前div值替換成所拿到的職			
+				
+			}
+			else
+			{
+				document.getElementById("country_name").innerHTML="型態錯誤(限定JSON)"; // 當前div值替換成所拿到的職
+			}
+
+		}
+	}
+	xmlhttp.open("GET","http://api.openweathermap.org/data/2.5/weather?APPID=d4720e296b235be97f68bb5a90026e1f&q="+str,true); //拿到 (送出的請求,URL,是否非同步) 缺點: 沒有擋下不存在的國家請求
+	xmlhttp.send(); //送出請求
+    
+  }	
+	
+ }
+</script>
+</head>
+<body>
+<form action=""> 
+输入國家: <input type="text" id="txt1" onkeyup="showHint(this.value)" /> <!-- 輸入的值被監聽  -->
+<div id="country_name"><h2>修改该文本内容</h2></div>	
+</form>
+<div id="myDiv"><h2>使用 AJAX 修改该文本内容</h2></div>
+<button type="button" onclick="loadXMLDoc()">修改内容</button>
+
+</body>
+</html>
